@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        function getSequence(arr){
+
+            const len = arr.length; // 长度
+            const result = [0]; // 保存最长递增子序列的索引
+            const p = arr.slice(0) // 和原来数组长度相同，用来记录前驱节点
+            let resultLastIndex; // 记录最后一个索引
+            let start;
+            let end;
+            let middle  // 记录二分查找的开始、中间和结束节点
+        
+            for(let i = 0; i < len; i++){ // O(n)
+                const arrI = arr[i]; // 获取数组中的每一项，但是0 没有意义我们需要忽略掉
+                if(arrI !== 0){ // 过滤掉0的值
+                    resultLastIndex = result[result.length - 1]; // 最长递增子序的最后一项
+                     // 取到索引对应的值
+                    if(arr[resultLastIndex] < arrI){ // 贪心算法，如果后面的值与前面的值比较，如果大往后追加，如果小，替换掉前面的某个节点
+                        p[i] = resultLastIndex // 标记当前前一个对应的索引
+                        result.push(i); // 记录索引
+                        continue
+                    }
+                    // 二分查找，找到比当前值大的那一个
+                    start = 0
+                    end = result.length - 1
+                    while (start < end) { // 重合时就说明找到了对应的值 // O(logn)时间复杂度
+                        middle = ((start + end) / 2) | 0 // 找到中间位置的前一个
+                        if (arr[result[middle]] < arrI) { // 说明在右边
+                            start = middle + 1
+                        } else { // 说明在左边
+                            end = middle
+                        }
+                    }
+                    // start 或 end 就是找到的位置
+                    if (arrI < arr[result[start]]) { // 如果相同或者比当前的还大就不换了
+                        if (start > 0) { // 比当前的小才需要替换
+                            p[i] = result[start - 1] // 要将他替换的前一个记住
+                        }
+                        result[start] = i
+                    }
+                }
+            }
+            let i = result.length // 总长度
+            let last = result[i - 1] // 找到最后一项，往前追溯
+            while (i-- > 0) { // 根据前驱节点一个个向前查找
+                result[i] = last // 最后一项肯定是正确的
+                last = p[last]
+            }
+            return result
+        }
+        getSequence([2, 3, 1, 5, 6, 8, 7, 9, 4])
+        console.log() // 2 3 5 6 7 9 -> 0 1 3 4 6 7
+    </script>
+</body>
+</html>

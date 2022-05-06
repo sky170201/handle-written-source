@@ -1,0 +1,5 @@
+packages:
+  - 'packages/*'
+
+# 将packages下所有的目录都作为包进行管理
+# 这样我们的Monorepo就搭建好了，比lerna + yarn workspace更快捷
