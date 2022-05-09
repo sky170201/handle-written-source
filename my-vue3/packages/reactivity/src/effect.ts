@@ -11,11 +11,11 @@ function cleanupEffect(effect) {
 
 // 这里要注意的是：触发时会进行清理操作（清理effect），在重新进行收集（收集effect）。在循环过程中会导致死循环。
 
-class ReactiveEffect{
+export class ReactiveEffect{
     active = true
     deps = [] // 收集effect中使用到的属性
     parent = undefined
-    constructor(public fn) {
+    constructor(public fn, public scheduler) {
         
     }
     run() {
@@ -40,8 +40,8 @@ class ReactiveEffect{
     }
 }
 
-export function effect (fn, options) {
-    const _effect = new ReactiveEffect(fn) // 创建响应式effect
+export function effect (fn, options:any = {}) {
+    const _effect = new ReactiveEffect(fn, options.scheduler) // 创建响应式effect
     _effect.run() // 让响应式effect默认执行
 
     const runner = _effect.run.bind(_effect)
@@ -85,5 +85,27 @@ export function trigger(target, type, key?, newValue?, oldValue?) {
                 }
             }
         }
+    }
+}
+
+// 创建ReactiveEffect时，传入scheduler函数，稍后依赖的属性变化时调用此方法
+export function triggerEffects(effects) {
+    effects = new Set(effects) // 去重effect
+    for (const effect of effects) {
+        if (effect !== activeEffect) { // 如果effect不是当前正在运行的effect
+            if (effect.scheduler) {
+                effect.scheduler()
+            } else {
+                effect.run() // 重新执行一遍
+            }
+        }
+    }
+}
+
+export function trackEffects(dep) { // 收集dep 对应的effect
+    let shouldTrack = !dep.has(activeEffect)
+    if (shouldTrack) {
+        dep.add(activeEffect)
+        activeEffect.deps.push(dep)
     }
 }

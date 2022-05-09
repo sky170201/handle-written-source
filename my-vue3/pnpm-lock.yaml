@@ -30,6 +30,20 @@ importers:
     dependencies:
       '@vue/shared': link:../shared
 
+  packages/runtime-core:
+    specifiers:
+      '@vue/reactivity': workspace:^1.0.0
+      '@vue/shared': workspace:^1.0.0
+    dependencies:
+      '@vue/reactivity': link:../reactivity
+      '@vue/shared': link:../shared
+
+  packages/runtime-dom:
+    specifiers:
+      '@vue/shared': workspace:^1.0.0
+    dependencies:
+      '@vue/shared': link:../shared
+
 packages:
 
   registry.npmmirror.com/@rollup/plugin-commonjs/22.0.0_rollup@2.72.0:
